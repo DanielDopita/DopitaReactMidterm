@@ -320,3 +320,9 @@ button {
   transition: background-color 0.3s;
   margin: 5px; /* Add some spacing */
 }
+
+.sort-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #6c757d;
+}

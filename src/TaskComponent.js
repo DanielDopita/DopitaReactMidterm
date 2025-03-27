@@ -1,21 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const TaskComponent = ({ task, tasks, onDeleteTask }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSorted, setIsSorted] = useState(false);
+  const [displayedTasks, setDisplayedTasks] = useState([...tasks]);
+
+  // Update displayedTasks when tasks prop changes
+  useEffect(() => {
+    filterAndSortTasks(searchTerm, isSorted);
+  }, [tasks]); // Add tasks to dependency array
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    filterAndSortTasks(term, isSorted);
   };
 
   const handleSort = () => {
-    const sortedTasks = [...tasks].sort();
-    setIsSorted(!isSorted);
+    const newSortState = !isSorted;
+    setIsSorted(newSortState);
+    filterAndSortTasks(searchTerm, newSortState);
   };
 
-  const filteredTasks = tasks.filter(task =>
-    task.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filterAndSortTasks = (term, shouldSort) => {
+    let result = [...tasks]; // Always start with fresh tasks from props
+    
+    // Filter first
+    if (term) {
+      result = result.filter(t => t.toLowerCase().includes(term));
+    }
+    
+    // Then sort if needed (works with any number of tasks)
+    if (shouldSort) {
+      result = [...result].sort(); // Create new array before sorting
+    }
+    
+    setDisplayedTasks(result);
+  };
 
   return (
     <div className="task-component">
@@ -29,13 +50,17 @@ const TaskComponent = ({ task, tasks, onDeleteTask }) => {
           onChange={handleSearch}
           className="task-search"
         />
-        <button onClick={handleSort} className="sort-button">
-          {isSorted ? "Reverse Sort" : "Sort A-Z"}
+        <button 
+          onClick={handleSort} 
+          className="sort-button"
+          disabled={displayedTasks.length <= 1} // Disable if 1 or fewer tasks
+        >
+          {isSorted ? "Unsort" : "Sort A-Z"}
         </button>
       </div>
 
       <ul className="task-list">
-        {filteredTasks.map((task, index) => (
+        {displayedTasks.map((task, index) => (
           <li key={index}>
             {task}
             <button 

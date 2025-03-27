@@ -36,10 +36,13 @@ const App = () => {
 
   const handleDeleteTask = (indexToDelete) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
-      setTasks(prev => prev.filter((_, index) => index !== indexToDelete));
+      const newTasks = tasks.filter((_, index) => index !== indexToDelete);
+      setTasks(newTasks);
       // Update random task if it was the deleted one
       if (randomTask === tasks[indexToDelete]) {
-        setRandomTask("");
+        setRandomTask(newTasks.length > 0 
+          ? newTasks[Math.floor(Math.random() * newTasks.length)] 
+          : "");
       }
     }
   };
